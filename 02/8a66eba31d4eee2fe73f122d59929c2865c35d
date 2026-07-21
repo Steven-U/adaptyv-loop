@@ -1,0 +1,19 @@
+docs/analysis-log.md
+  s_fa64f2b1811f50::t_b80cfa7e97325c 1-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "028a66eba31d4eee2fe73f122d59929c2865c35d",
+  "prompts": {},
+  "sessions": {
+    "s_fa64f2b1811f50": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "10248b06-3773-4284-83cd-1c72cf0ba333",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Steven-U <steven.ung@outlook.fr>"
+    }
+  }
+}
