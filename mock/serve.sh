@@ -12,8 +12,16 @@ cd "$(dirname "$0")/.."
 PYTHON="${PYTHON:-./.venv/bin/python}"
 SPEC="backtest/foundry_openapi.json"
 
+# --library also loads the generated design library, so novel sequences get an
+# outcome from the calibrated simulated bench instead of "unknown".
+LIBRARY=""
+if [ "${1:-}" = "--library" ]; then
+  LIBRARY="design_library.json"
+  [ -f "$LIBRARY" ] || { echo "no $LIBRARY — run: python demo_end_to_end.py --build-library"; exit 1; }
+fi
+
 echo "starting mock Foundry (:4011) ..."
-"$PYTHON" mock/mock_foundry.py 4011 &
+"$PYTHON" mock/mock_foundry.py 4011 $LIBRARY &
 MOCK_PID=$!
 
 cleanup() { kill "$MOCK_PID" 2>/dev/null || true; }

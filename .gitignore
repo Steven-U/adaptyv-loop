@@ -18,3 +18,5 @@ backtest/data/
 *.decisions.jsonl
 *.state.json
 .adaptyv-mock/
+design_library.json
+.adaptyv-e2e/

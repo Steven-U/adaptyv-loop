@@ -42,12 +42,43 @@ def _load_truth() -> dict[str, bool]:
 
 
 class FoundryState:
-    """In-memory experiment store. Deterministic ids, no wall clock."""
+    """In-memory experiment store. Deterministic ids, no wall clock.
 
-    def __init__(self) -> None:
+    Outcomes come from two sources. A sequence that appears in the public
+    competition gets its real measured result. A novel sequence — anything
+    ``adaptyv_loop.design`` generated — has no measurement in existence, so it
+    is routed to :class:`~adaptyv_loop.bench.SimulatedBench`, which is loaded
+    only if a design library manifest is present.
+    """
+
+    def __init__(self, library: str | Path | None = None) -> None:
         self.truth = _load_truth()
+        self.bench = None
+        self.scores: dict[str, float] = {}
+        if library:
+            self._load_library(Path(library))
         self.experiments: dict[str, dict] = {}
         self._counter = 0
+
+    def _load_library(self, path: Path) -> None:
+        from adaptyv_loop.bench import SimulatedBench
+
+        payload = json.loads(path.read_text())
+        seqs = [d["sequence"] for d in payload["designs"]]
+        scores = [d["score"] for d in payload["designs"]]
+        self.scores = dict(zip(seqs, scores))
+        self.bench = SimulatedBench.calibrate(seqs, scores)
+        print(f"simulated bench calibrated on {len(seqs)} novel designs "
+              f"(intercept {self.bench.intercept:.3f})")
+
+    def outcome(self, sequence: str) -> str:
+        """Real measurement where one exists, simulated where none can."""
+        seq = str(sequence)
+        if seq in self.truth:
+            return "true" if self.truth[seq] else "false"
+        if self.bench is not None and seq in self.scores:
+            return "true" if self.bench.measure(seq, self.scores[seq]) else "false"
+        return "unknown"
 
     def create(self, name: str, spec: dict) -> dict:
         """Returns CreateExpResponse — note the id is keyed `experiment_id`."""
@@ -109,9 +140,8 @@ class FoundryState:
         exp = self.experiments[exp_id]
         summary = []
         for name, seq in exp["sequences"].items():
-            hit = self.truth.get(str(seq))
-            binding = "unknown" if hit is None else ("true" if hit else "false")
-            strength = "none" if not hit else "strong"
+            binding = self.outcome(seq)
+            strength = "strong" if binding == "true" else "none"
             summary.append({
                 "result_type": "affinity",
                 "sequence": {"aa_string": str(seq), "name": name, "control": False},
@@ -238,7 +268,10 @@ class Handler(BaseHTTPRequestHandler):
 def main() -> int:
     global STATE
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 4011
-    STATE = FoundryState()
+    library = sys.argv[2] if len(sys.argv) > 2 else None
+    if library and not Path(library).exists():
+        library = None
+    STATE = FoundryState(library)
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     print(f"mock Foundry on http://127.0.0.1:{port} "
           f"({len(STATE.truth)} real EGFR outcomes loaded)")

@@ -186,6 +186,50 @@ It also shows the division of labour: Prism enforces the structural schema
 spec, so `build_experiment_spec` enforces that locally before a request is
 ever sent.
 
+**`python demo_end_to_end.py`** — the whole pipeline, design through decision.
+
+```bash
+python demo_end_to_end.py --build-library   # generate + score with ESM-2
+./mock/serve.sh --library                   # terminal 1
+python demo_end_to_end.py                   # terminal 2
+```
+
+Four generators propose variants of a real anti-EGFR nanobody scaffold — CDR
+mutagenesis, ESM-2-guided design, germline recombination with a randomized
+CDR3, and a uniform-random negative control — with CDRs located by conserved
+framework anchors rather than fixed indices. ESM-2 scores them locally (about
+14 seconds for 600 designs on an M4). Then the loop allocates, submits through
+the contract-validated stack, and learns.
+
+The bench for these designs is simulated and labelled as such: they are novel,
+so no measurement for them exists anywhere. It sees only the sequence, never
+the generator label, and its effect sizes are calibrated to the competition
+data — 14% base rate solved by bisection, within-method AUC 0.64 against the
+measured 0.636. Beyond ESM-2 score it carries two real biophysical terms the
+score misses: CDR3 length deviation from the parent scaffold, and CDR
+liabilities (N-glycosylation sequons, NG deamidation, DG isomerization, free
+cysteine) which language models score as perfectly ordinary.
+
+**Result, reported as measured:**
+
+| strategy | binders | hit rate | cost/binder |
+|---|---|---|---|
+| buy blind from the library | 22 | 14.0% | $707 |
+| rank by ESM-2 score only | 43 | 26.9% | $368 |
+| adaptyv-loop | 40 | 25.0% | $396 |
+
+The loop **tied** score-ranking here (−1.9pp, 0.4 sigma), it did not beat it.
+That is the expected result and it corroborates the main finding rather than
+denting it: on this library ESM-2 PLL happens to rank all four generators in
+exactly their true quality order, so allocating by method is redundant with
+sorting by score. Method allocation pays only when method carries signal the
+per-design score misses — the warm-start case on the real data. It is the same
+mechanism that made the real cold-start case only match ipTM.
+
+What the loop did add: it identified the dead generator without being told and
+spent **zero** of its budget there, though that generator is 25% of the
+library. And it does not depend on the score happening to be this well aligned.
+
 **`python demo_live.py --target EGFR`** — the same flow against the real API
 once you have a token, using only non-billable endpoints. Foundry tokens
 require onboarding through an organization account, so this one is here for
@@ -196,7 +240,8 @@ completeness rather than as the demo.
 ```bash
 pip install -e .            # runtime: requests
 pip install -e '.[dev]'     # + pytest, pandas, numpy, scikit-learn
-pytest                      # 59 tests
+pip install -e '.[design]'  # + torch, fair-esm (generation and scoring)
+pytest                      # 76 tests
 python backtest/run_backtest.py
 ```
 
@@ -208,6 +253,8 @@ python backtest/run_backtest.py
 | `adaptyv_loop/guardrails.py` | spend ceilings, dry-run gate, append-only decision log |
 | `adaptyv_loop/selection.py` | Beta-Binomial method posteriors, budget allocation |
 | `adaptyv_loop/campaign.py` | the resumable loop |
+| `adaptyv_loop/design.py` | four generators + local ESM-2 scoring |
+| `adaptyv_loop/bench.py` | simulated bench for novel designs, calibrated to the real data |
 | `adaptyv_loop/report.py` | spend and yield in budget-holder units |
 | `backtest/run_backtest.py` | all four analyses above, reproducible |
 | `mock/mock_foundry.py` | local Foundry serving real EGFR data in real schema shapes |
