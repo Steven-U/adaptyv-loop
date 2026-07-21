@@ -1,0 +1,47 @@
+adaptyv_loop/campaign.py
+  s_fa64f2b1811f50::t_7d246a1855d3bc 23
+  s_fa64f2b1811f50::t_d5e9a0439ca8fe 248-253
+mock/serve.sh
+  s_fa64f2b1811f50::t_402829a14895eb 1-25
+tests/test_client.py
+  s_fa64f2b1811f50::t_b373ccc8c751d5 236-240,247,305-311
+  s_fa64f2b1811f50::t_2ec811db31883d 241-246,248-304
+demo_mock.py
+  s_fa64f2b1811f50::t_b2483ddab4d802 94
+  s_fa64f2b1811f50::t_48609f02359638 1-93,95-154
+mock/mock_foundry.py
+  s_fa64f2b1811f50::t_529eea7afec983 127-129
+  s_fa64f2b1811f50::t_b37d61c43fc79b 146-148,152-160
+  s_fa64f2b1811f50::t_f35f732c040126 208-212
+  s_fa64f2b1811f50::t_02351c284d7f92 63-67
+  s_fa64f2b1811f50::t_f8b3533cc50bee 101
+  s_fa64f2b1811f50::t_5843c039c2abf2 53,56,58,69-74,77-87,90-93,96-100,102-105,107-108,114-126,132,136-139
+  s_fa64f2b1811f50::t_8200f651f649df 1-52,54-55,57,59-62,68,75-76,88-89,94-95,106,109-113,130-131,133-135,140-145,149-151,161-207,213-253
+README.md
+  s_fa64f2b1811f50::t_e9c684ec3971ca 199
+  s_fa64f2b1811f50::t_399c8416357617 217-239,241,255
+  s_fa64f2b1811f50::t_0c2e02b46f049c 213-215
+  s_fa64f2b1811f50::t_eae74f0adb7bec 32-42,50
+  s_fa64f2b1811f50::t_9334d79317ccf6 149-150
+  s_fa64f2b1811f50::t_22d9c083805333 159-192
+  s_fa64f2b1811f50::t_d8c6f8edf602cd 61-63,65-66,68,70-73,75-77,79-84
+  s_fa64f2b1811f50::t_5e71a02004df42 216
+.gitignore
+  s_fa64f2b1811f50::t_82f147353392ae 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6875ddb38d98e8a60cd88494d0198964876b065d",
+  "prompts": {},
+  "sessions": {
+    "s_fa64f2b1811f50": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "10248b06-3773-4284-83cd-1c72cf0ba333",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Steven-U <steven.ung@outlook.fr>"
+    }
+  }
+}
