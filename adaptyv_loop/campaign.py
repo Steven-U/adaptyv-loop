@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .client import ExperimentType, FoundryClient, Method, build_experiment_spec
-from .errors import GuardrailViolation
+from .errors import APIError, GuardrailViolation
 from .guardrails import DecisionLog, SpendGuard, SpendPolicy
 from .selection import (
     Candidate,
@@ -245,7 +245,12 @@ class Campaign:
         experiment = self.client.create_experiment(
             name, spec, auto_accept_quote=auto_accept_quote
         )
-        experiment_id = experiment.get("id")
+        # CreateExpResponse keys the id as `experiment_id`; ExpInfo and most
+        # other reads key it as `id`. Accept either so this does not depend on
+        # which endpoint shape a given response happens to use.
+        experiment_id = experiment.get("experiment_id") or experiment.get("id")
+        if not experiment_id:
+            raise APIError(0, f"create_experiment returned no id: {experiment}")
         if not auto_accept_quote:
             # Without auto-accept the experiment sits in draft until a human
             # confirms the quote; submit advances it as far as it can go.

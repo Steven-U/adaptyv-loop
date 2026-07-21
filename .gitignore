@@ -17,3 +17,4 @@ backtest/data/
 .adaptyv-live/
 *.decisions.jsonl
 *.state.json
+.adaptyv-mock/

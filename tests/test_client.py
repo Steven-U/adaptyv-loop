@@ -233,3 +233,79 @@ def test_entries_without_a_name_are_skipped():
 def test_empty_results_are_handled():
     assert outcomes_from_results([]) == {}
     assert outcomes_from_results([{"summary": None}]) == {}
+
+
+# ---- response-shape quirks caught by contract-checking against the real spec ----
+
+
+def test_campaign_reads_the_id_from_create_response(tmp_path):
+    """CreateExpResponse keys the id as `experiment_id`; ExpInfo uses `id`.
+
+    Reading only `id` silently yields None, and the campaign then submits and
+    polls against a null experiment. Caught by running the client against
+    Adaptyv's published OpenAPI spec behind a Prism validating proxy.
+    """
+    from adaptyv_loop import Campaign, Candidate, SpendPolicy, select_designs
+
+    class Stub:
+        def __init__(self, create_body):
+            self.create_body = create_body
+            self.submitted = []
+
+        def cost_estimate(self, spec):
+            return CostEstimate(total_cents=10_000, pricing_version="v1")
+
+        def create_experiment(self, name, spec, *, auto_accept_quote=False):
+            return self.create_body
+
+        def submit_experiment(self, experiment_id):
+            self.submitted.append(experiment_id)
+            return {}
+
+    for body, expected in (
+        ({"experiment_id": "exp-42", "error": None}, "exp-42"),   # CreateExpResponse
+        ({"id": "exp-7"}, "exp-7"),                               # ExpInfo-style
+    ):
+        stub = Stub(body)
+        campaign = Campaign(
+            stub,
+            campaign_id=f"c-{expected}",
+            target_id="t-1",
+            policy=SpendPolicy(max_experiment_usd=1_000, max_campaign_usd=1_000),
+            state_dir=tmp_path,
+        )
+        selection = select_designs(
+            [Candidate(id="d1", sequence="MKT", method="m")], 1
+        )
+        record = campaign.submit_round(selection)
+        assert record.experiment_id == expected
+        assert stub.submitted == [expected]
+
+
+def test_campaign_rejects_a_create_response_with_no_id(tmp_path):
+    from adaptyv_loop import Campaign, Candidate, SpendPolicy, select_designs
+
+    class Stub:
+        def cost_estimate(self, spec):
+            return CostEstimate(total_cents=10_000, pricing_version="v1")
+
+        def create_experiment(self, name, spec, *, auto_accept_quote=False):
+            return {"error": "something went wrong"}
+
+    campaign = Campaign(
+        Stub(),
+        campaign_id="c-bad",
+        target_id="t-1",
+        policy=SpendPolicy(max_experiment_usd=1_000, max_campaign_usd=1_000),
+        state_dir=tmp_path,
+    )
+    selection = select_designs([Candidate(id="d1", sequence="MKT", method="m")], 1)
+    with pytest.raises(APIError, match="no id"):
+        campaign.submit_round(selection)
+
+
+def test_results_are_paginated_not_a_bare_array():
+    """GET /experiments/{id}/results returns the standard list envelope."""
+    envelope = {"items": [{"id": "r1", "summary": []}], "total": 1, "offset": 0, "count": 1}
+    c = client_with([FakeResponse(200, envelope)])
+    assert c.get_results("exp-1") == [{"id": "r1", "summary": []}]

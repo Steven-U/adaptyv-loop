@@ -29,7 +29,17 @@ record = campaign.submit_round(selection)      # bills, only after guardrails pa
 campaign.collect_round(record, candidates)     # results feed the next round
 ```
 
-## What the data actually says
+## The result
+
+**Allocating test budget by design method finds 20–40% more binders per dollar
+than ranking by ipTM** — the standard filter — once you have one campaign of
+history. At these budgets that's worth roughly $100–150 per binder found.
+
+The reason is a signal most pipelines throw away. Everyone filters on
+per-design confidence scores, which turn out to be weak, while the design
+*method* separates outcomes by 9x and is knowable before a dollar is spent.
+This package makes method the primary allocation unit and keeps the history
+that makes it work.
 
 Everything below is measured on Adaptyv's public EGFR competition results
 ([round 1](https://github.com/adaptyvbio/egfr_competition_1),
@@ -37,18 +47,7 @@ Everything below is measured on Adaptyv's public EGFR competition results
 designs carrying both the computational metrics you have *before* spending
 money and the wet-lab outcome. Reproduce with `python backtest/run_backtest.py`.
 
-**The standard filters barely discriminate.** Binder/non-binder AUC, where
-0.5 is a coin flip:
-
-| metric | AUC | |
-|---|---|---|
-| pLDDT | 0.656 | weak but real |
-| ipTM | 0.636 | weak but real |
-| ESM2 pseudo-LL | 0.547 | essentially uninformative |
-| `pae_interaction` | 0.388 | points the **wrong way** vs. the usual "lower iPAE is better" |
-
-**Design method is the real lever, and it's free to act on.** Hit rate by
-declared method, 14.0% base rate:
+**Design method is the lever.** Hit rate by declared method, 14.0% base rate:
 
 | method | n | binders | rate |
 |---|---|---|---|
@@ -59,41 +58,30 @@ declared method, 14.0% base rate:
 | Custom ensemble/diffusion | 41 | 2 | 4.9% |
 | Rosetta | 6 | 0 | 0.0% |
 
-A 9x spread across methods, against a 0.64 AUC on individual designs. The most
-popular method in the competition was also nearly the worst.
+The most popular method in the competition was also nearly the worst: 83
+designs used RFdiffusion + ProteinMPNN for a 7.2% return, while 30 designs
+using ProteinMPNN/LigandMPNN alone returned 43.3%.
 
-**A learned per-design model does not survive an honest transfer test.**
-Cross-validated on round 2 it looks great — 25.1 binders per 80 tests against
-ipTM's 19.3. Trained on round 1 and applied to round 2, which is the setup you
-actually face, it drops to 16.0 and *loses* to plain ipTM. That is why this
-package ships no learned per-design model.
+**The per-design scores everyone filters on are much weaker.** Binder /
+non-binder AUC, where 0.5 is a coin flip:
 
-**The baseline is weaker than it looks.** ipTM is quantized to two decimals, so
-78 distinct values cover 378 designs and every budget cut lands inside a large
-tie group. Breaking ties by row order instead of at random swings the ipTM
-baseline between 9 and 17 binders at K=60 on luck alone. All comparisons here
-randomize ties for every strategy.
-
-## Does the policy help?
-
-Two honest answers, because the result depends on whether you have history.
-
-**Cold start — no prior campaign. It matches ipTM, it does not beat it.**
-
-| strategy | binders (60 tests, $5,940) | cost/binder |
+| metric | AUC | |
 |---|---|---|
-| random draw | 8.3 | $714 |
-| rank by ipTM | 15.8 | $377 |
-| adaptyv-loop | 15.6 | $381 |
+| pLDDT | 0.656 | weak but real |
+| ipTM | 0.636 | weak but real |
+| ESM2 pseudo-LL | 0.547 | essentially uninformative |
+| `pae_interaction` | 0.388 | points the **wrong way** vs. the usual "lower iPAE is better" |
 
-Two rounds isn't enough to learn method rates, and on this pool ipTM already
-acts as a proxy for method — its top 60 designs are 23 ProteinMPNN entries
-supplying 13 of the 17 binders found there. Claiming a cold-start win would be
-overfitting to one dataset.
+A 9x spread across methods against a 0.64 AUC on individual designs. So method
+drives the allocation, and the per-design score only orders candidates once the
+budget is split.
 
-**Warm start — method rates carried over from one prior campaign. +20–40%.**
-Designs split in half at random; half A is the prior campaign, half B is the
-new pool. No design appears in both, only the method rates transfer.
+## Measured lift
+
+Method rates carried over from one prior campaign. Designs are split in half at
+random: half A is the prior campaign whose results are known, half B is the new
+pool being selected from. No design appears in both — only the method rates
+transfer.
 
 | strategy | 20 tests | 40 tests | 60 tests |
 |---|---|---|---|
@@ -158,8 +146,8 @@ Nothing was submitted and no invoice exists.
 **`python demo_offline.py`** — the full loop, no token, no spend. The
 simulated lab answers with the *real* wet-lab outcomes from the EGFR
 competition, so every posterior update the loop learns from actually happened
-at the bench. Three rounds of 45 designs on a $14k budget reach a 20–22% hit
-rate against the 14.0% base rate, around $460–495/binder, then round four is
+at the bench. Three rounds of 45 designs on a $14k budget reach a 19–22% hit
+rate against the 14.0% base rate, around $445–515/binder, then round four is
 refused for want of budget. Re-running resumes at round four rather than
 restarting. The spread across runs is tie-breaking, which is randomized by
 design.
@@ -168,20 +156,47 @@ This one is offline because a live learning loop is undemoable: each round
 bills ~$4,455 and takes about three weeks, so three rounds is $13k and two
 months.
 
-**`python demo_live.py --target EGFR`** — against the real API, spending
-nothing. Uses only non-billable endpoints: `/whoami`, `/targets`, and
-`/experiments/cost-estimate`. It authenticates, resolves a real catalog target,
-selects designs under budget, asks Foundry what the experiment would actually
-cost, then shows the guardrails passing and deliberately failing. The submit
-step is printed rather than executed unless you pass
-`--i-want-to-spend-money`.
+**`./mock/serve.sh` then `python demo_mock.py`** — the full loop over real
+HTTP, validated against Adaptyv's genuine published OpenAPI contract. No token,
+no access, no spend.
+
+```
+demo_mock.py -> Prism (:4010) -> mock Foundry (:4011)
+                  |                 |
+                  |                 real EGFR target, $99/protein pricing,
+                  |                 real wet-lab binding outcomes
+                  |
+                  validates every request AND response against
+                  backtest/foundry_openapi.json — Adaptyv's real spec.
+                  A non-conforming payload is a 4xx, not a silent pass.
+```
+
+This is the strongest correctness evidence in the repo, because the contract
+check is adversarial: it found three real shape bugs while being built. The
+`create` response keys the id as `experiment_id`, not `id` — reading `id`
+silently yields `None` and the campaign then submits against a null
+experiment. Results come back in the paginated list envelope rather than a
+bare array. And `TargetPricing` is a tagged union whose `per_sequence` branch
+requires `price_per_sequence_cents`, not the flat field I first assumed. All
+three are now regression-tested.
+
+It also shows the division of labour: Prism enforces the structural schema
+(a spec missing `experiment_type` gets a 422), while the type/field matrix —
+"thermostability rejects a `target_id`" — is documented only in prose in the
+spec, so `build_experiment_spec` enforces that locally before a request is
+ever sent.
+
+**`python demo_live.py --target EGFR`** — the same flow against the real API
+once you have a token, using only non-billable endpoints. Foundry tokens
+require onboarding through an organization account, so this one is here for
+completeness rather than as the demo.
 
 ## Install
 
 ```bash
 pip install -e .            # runtime: requests
 pip install -e '.[dev]'     # + pytest, pandas, numpy, scikit-learn
-pytest                      # 56 tests
+pytest                      # 59 tests
 python backtest/run_backtest.py
 ```
 
@@ -195,8 +210,35 @@ python backtest/run_backtest.py
 | `adaptyv_loop/campaign.py` | the resumable loop |
 | `adaptyv_loop/report.py` | spend and yield in budget-holder units |
 | `backtest/run_backtest.py` | all four analyses above, reproducible |
+| `mock/mock_foundry.py` | local Foundry serving real EGFR data in real schema shapes |
+| `mock/serve.sh` | brings up the Prism-validated stack |
+| `backtest/foundry_openapi.json` | Adaptyv's real published OpenAPI 3.1 spec |
 
-## Caveats
+## Method notes and limits
+
+Three things worth knowing before quoting the numbers above.
+
+**The lift needs history.** With no prior campaign, splitting a budget into an
+explore round and an exploit round only *matches* ipTM ranking (15.6 vs 15.8
+binders per 60 tests) rather than beating it. Two rounds isn't enough to learn
+method rates, and on this pool ipTM is partly acting as a proxy for method
+anyway — its top 60 designs are 23 ProteinMPNN entries supplying 13 of the 17
+binders found there. The 20–40% figure is a warm-start number and is reported
+as one.
+
+**No learned per-design model, deliberately.** A gradient-boosted model on the
+per-design metrics looks strong under cross-validation (25.1 binders per 80
+tests vs ipTM's 19.3) but drops to 16.0 when trained on round 1 and applied to
+round 2, which is the setup you actually face. Method-level allocation is where
+the transferable signal lives, so that is what ships.
+
+**Tie-breaking is load-bearing.** ipTM is quantized to two decimals, so 78
+distinct values cover 378 designs and every budget cut lands inside a large tie
+group. Ordering ties by dataframe row order instead of at random swings the
+ipTM baseline between 9 and 17 binders at K=60 on luck alone. Every comparison
+here randomizes ties for every strategy, including the baselines.
+
+Remaining limits:
 
 - Everything is measured on one target (EGFR) in a crowdsourced competition.
   The method mix in a competition is not the method mix inside one company's
@@ -210,6 +252,6 @@ python backtest/run_backtest.py
   make the reported lift optimistic.
 - Only `screening` and `affinity` paths have been exercised end to end.
   Thermostability, expression, and enzyme-activity specs validate but are
-  untested against the live API.
+  untested against a real Foundry instance.
 
 Data: Adaptyv EGFR competition rounds 1–2, ODbL. Not affiliated with Adaptyv Bio.
