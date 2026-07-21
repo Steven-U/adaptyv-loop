@@ -1,0 +1,69 @@
+adaptyv_loop/client.py
+  s_fa64f2b1811f50::t_ef6f79f7fb041f 1-404
+adaptyv_loop/report.py
+  s_fa64f2b1811f50::t_a9b4cc1dcbfce8 1-68
+adaptyv_loop/__init__.py
+  s_fa64f2b1811f50::t_3d4f096d0af283 1-63
+demo_offline.py
+  s_fa64f2b1811f50::t_81db9f36398d23 1-105,107,111-142
+  s_fa64f2b1811f50::t_4ec7a0c60bd088 106,108-110
+pyproject.toml
+  s_fa64f2b1811f50::t_f16faae8644c8c 1-30
+backtest/run_backtest.py
+  s_fa64f2b1811f50::t_0bf8cf10cc1b87 193-201
+  s_fa64f2b1811f50::t_4019dcbaf3aa98 272
+  s_fa64f2b1811f50::t_c071d0dfa035a0 216-230,233,235-245,248-255,259-260,269-271,273,275-323,325-330
+  s_fa64f2b1811f50::t_f2fdc14005dc84 206
+  s_fa64f2b1811f50::t_adae8d70760cd3 1-192,202-205,207-215,231-232,234,246-247,256-258,261-268,274,324,331-353
+adaptyv_loop/selection.py
+  s_fa64f2b1811f50::t_1fd1ec293f2e39 268-272,276-279,281-290
+  s_fa64f2b1811f50::t_a49b3e8f5aa769 168-177,180-191
+  s_fa64f2b1811f50::t_61a802c33605ac 38-43
+  s_fa64f2b1811f50::t_21a3715f9f657c 231-233
+  s_fa64f2b1811f50::t_52f823d9ba420d 296-302
+  s_fa64f2b1811f50::t_f892e21b5d2f7c 238,240,242-252
+  s_fa64f2b1811f50::t_9af19af9e9e1f7 1-37,44-127,136-167,178-179,192-194,197,203,205-230,234-237,239,241,253-267,273-275,280,291-295,303-369
+  s_fa64f2b1811f50::t_7fccf93aaf919c 195-196,198-202,204
+  s_fa64f2b1811f50::t_084d15821e2518 128-135
+adaptyv_loop/guardrails.py
+  s_fa64f2b1811f50::t_594360a74acd0f 1-107,119-303
+  s_fa64f2b1811f50::t_583d6af92eca56 108-118
+tests/test_selection.py
+  s_fa64f2b1811f50::t_11fa318b1c889c 1-165
+.gitignore
+  s_fa64f2b1811f50::t_c54c5f88c7bfdb 1-19
+demo_live.py
+  s_fa64f2b1811f50::t_5c37f4bc19cca3 100-105,108-112
+  s_fa64f2b1811f50::t_6521da74c28ab6 32
+  s_fa64f2b1811f50::t_c923937a1770b4 1-31,33-99,106-107,113-207
+tests/test_guardrails.py
+  s_fa64f2b1811f50::t_32b852a27bf9f3 1-136
+adaptyv_loop/errors.py
+  s_fa64f2b1811f50::t_0a12742ecba2e4 1-32
+README.md
+  s_fa64f2b1811f50::t_8201b27fcc98cf 161-165
+  s_fa64f2b1811f50::t_b16a8dca8e0b2a 67
+  s_fa64f2b1811f50::t_43b99fe53e8d1e 1-66,68-160,166-215
+tests/test_client.py
+  s_fa64f2b1811f50::t_6e1063295bc511 1-235
+adaptyv_loop/campaign.py
+  s_fa64f2b1811f50::t_58c87dc559dcea 1-349
+backtest/foundry_openapi.json
+  s_fa64f2b1811f50::t_cc8825f8e1cbcb 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "a581261295323962467822c1dcf6f764f50a750a",
+  "prompts": {},
+  "sessions": {
+    "s_fa64f2b1811f50": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "10248b06-3773-4284-83cd-1c72cf0ba333",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Steven-U <steven.ung@outlook.fr>"
+    }
+  }
+}
