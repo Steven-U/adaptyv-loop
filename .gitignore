@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Cloned competition datasets — run backtest/run_backtest.py to fetch.
+backtest/data/
+
+# Campaign state and decision logs. Never commit these: they record real spend.
+.adaptyv/
+.adaptyv-demo/
+.adaptyv-live/
+*.decisions.jsonl
+*.state.json
