@@ -1,0 +1,39 @@
+backtest/run_backtest.py
+  s_e6d2aad9c1474a::t_f1679184c42730 331-332
+  s_e6d2aad9c1474a::t_82514c432ae293 330
+  s_e6d2aad9c1474a::t_3ee28af04c305a 161-164
+  s_e6d2aad9c1474a::t_08244c49854a28 329
+docs/analysis-log.md
+  s_e6d2aad9c1474a::t_0048cab649d2e2 40-42,46,53-54
+  s_e6d2aad9c1474a::t_8397d610a032e4 153-154
+  s_e6d2aad9c1474a::t_841014c5952bb5 165-168
+  s_e6d2aad9c1474a::t_9bcbe85ba91555 55
+README.md
+  s_e6d2aad9c1474a::t_9f24265414318b 110-113,119-120
+  s_e6d2aad9c1474a::t_cabb5bb780647e 37
+  s_e6d2aad9c1474a::t_932226b4fa37c8 294
+  s_e6d2aad9c1474a::t_b34b5ad153a9c2 53-54,59,61,63-66,68,70-71,74-81
+  s_e6d2aad9c1474a::t_9372b2e2b91470 270
+  s_e6d2aad9c1474a::t_d1ca0a0f24c77a 36
+  s_e6d2aad9c1474a::t_8b8fb5f560b410 82
+  s_e6d2aad9c1474a::t_366e420bb2a64b 121
+  s_e6d2aad9c1474a::t_06501bd8945144 34,298
+demo_end_to_end.py
+  s_e6d2aad9c1474a::t_2a0fa8c60ad36d 226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "df095bead72eba259c4ef98c42dd42bc854f70ab",
+  "prompts": {},
+  "sessions": {
+    "s_e6d2aad9c1474a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9f31b9ab-1508-4f93-a4ca-88740c638ae9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Steven-U <steven.ung@outlook.fr>"
+    }
+  }
+}
