@@ -1,0 +1,28 @@
+README.md
+  s_e6d2aad9c1474a::t_a5ddd208199daa 276
+  s_e6d2aad9c1474a::t_44b0c4c995bdde 307-317
+  s_e6d2aad9c1474a::t_938230d9ddd28a 34,36-39
+demo_end_to_end.py
+  s_e6d2aad9c1474a::t_a4263a8899abe5 226
+backtest/run_backtest.py
+  s_e6d2aad9c1474a::t_250ddf3ac24c6c 326
+  s_e6d2aad9c1474a::t_3a306d2beac201 327
+LICENSE
+  s_e6d2aad9c1474a::t_e1cacb7c90a974 1-202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6d4308f88876b7d6b33d0da96bbd1f4b1c40f8fd",
+  "prompts": {},
+  "sessions": {
+    "s_e6d2aad9c1474a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9f31b9ab-1508-4f93-a4ca-88740c638ae9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Steven-U <steven.ung@outlook.fr>"
+    }
+  }
+}
