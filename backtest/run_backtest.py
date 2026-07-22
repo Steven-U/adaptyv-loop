@@ -323,7 +323,8 @@ def section_campaign(r2: pd.DataFrame, trials: int) -> None:
         ], total, base)
 
     print("Verdict: with one prior campaign of history, allocating by method beats")
-    print("ipTM ranking by roughly 20-40%, worth ~$100-150 per binder found at these")
+    print("ipTM ranking by 13-41%, steady at +20-26% for method history alone,")
+    print("worth ~$100-150 per binder found at these")
     print("budgets. The value is in KEEPING the history, not in any one order — which")
     print("is the whole argument for wiring the loop together rather than exporting")
     print("a CSV per campaign.\n")

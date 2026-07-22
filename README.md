@@ -31,9 +31,12 @@ campaign.collect_round(record, candidates)     # results feed the next round
 
 ## The result
 
-**Allocating test budget by design method finds 20–40% more binders per dollar
+**Allocating test budget by design method finds 13–41% more binders per dollar
 than ranking by ipTM** — the standard filter — once you have one campaign of
-history. At these budgets that's worth roughly $100–150 per binder found.
+history. Method-history allocation holds a steady +20–26% across every budget
+tested; adding ipTM as a tiebreaker is stronger at small budgets (+41% at 20
+tests) and weaker at larger ones (+13% at 60). At these budgets that's worth
+roughly $100–150 per binder found.
 
 The reason is a signal most pipelines throw away. Everyone filters on
 per-design confidence scores, which turn out to be weak, while the design
@@ -270,7 +273,7 @@ explore round and an exploit round only *matches* ipTM ranking (15.6 vs 15.8
 binders per 60 tests) rather than beating it. Two rounds isn't enough to learn
 method rates, and on this pool ipTM is partly acting as a proxy for method
 anyway — its top 60 designs are 23 ProteinMPNN entries supplying 13 of the 17
-binders found there. The 20–40% figure is a warm-start number and is reported
+binders found there. The 13–41% figure is a warm-start number and is reported
 as one.
 
 **No learned per-design model, deliberately.** A gradient-boosted model on the
@@ -300,5 +303,16 @@ Remaining limits:
 - Only `screening` and `affinity` paths have been exercised end to end.
   Thermostability, expression, and enzyme-activity specs validate but are
   untested against a real Foundry instance.
+
+## Licence
+
+Code in this repository is Apache 2.0 (see `LICENSE`).
+
+The competition data is **not redistributed here**. `backtest/data/` is
+gitignored; `backtest/run_backtest.py` fetches it from Adaptyv's own
+repositories at run time, where it is published under the
+[ODbL](https://opendatacommons.org/licenses/odbl/). The measurements in this
+README and in `docs/analysis-log.md` are a Produced Work derived from that
+database, attributed above.
 
 Data: Adaptyv EGFR competition rounds 1–2, ODbL. Not affiliated with Adaptyv Bio.
