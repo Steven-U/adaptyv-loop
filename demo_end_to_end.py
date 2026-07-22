@@ -223,7 +223,7 @@ def main() -> int:
         print("four generators in exactly their true quality order, so allocating by")
         print("method is redundant with sorting by score. Method allocation pays only")
         print("when method carries signal the per-design score misses — which is the")
-        print("warm-start case on the real competition data (+13-41%), and is exactly")
+        print("warm-start case on the real competition data (+13-40%), and is exactly")
         print("why the cold-start case there also only matched ipTM.")
     print("\nWhat the loop did add: it found the dead generator without being told,")
     print("and it is robust to a score that does not happen to be this well aligned.")

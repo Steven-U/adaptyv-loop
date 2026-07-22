@@ -158,7 +158,10 @@ def section_transfer(r1: pd.DataFrame, r2: pd.DataFrame) -> None:
         from sklearn.ensemble import GradientBoostingClassifier
         from sklearn.model_selection import StratifiedKFold
     except ImportError:
-        print("scikit-learn not installed; skipping. pip install scikit-learn")
+        print("!! SKIPPED — scikit-learn is not installed, so this section did not run.")
+        print("!! This is the negative result the package's design rests on (no learned")
+        print("!! per-design model ships). Reproduce it with:")
+        print("!!     pip install -e '.[dev]'")
         return
 
     feats = ["plddt", "pae_interaction"]  # the only features both rounds share
@@ -323,11 +326,10 @@ def section_campaign(r2: pd.DataFrame, trials: int) -> None:
         ], total, base)
 
     print("Verdict: with one prior campaign of history, allocating by method beats")
-    print("ipTM ranking by 13-41%, steady at +20-26% for method history alone,")
-    print("worth ~$100-150 per binder found at these")
-    print("budgets. The value is in KEEPING the history, not in any one order — which")
-    print("is the whole argument for wiring the loop together rather than exporting")
-    print("a CSV per campaign.\n")
+    print("ipTM ranking by 13-40%, steady at +20-27% for method history alone, worth")
+    print("~$100-150 per binder found at these budgets. The value is in KEEPING the")
+    print("history, not in any one ordering — which is the whole argument for wiring")
+    print("the loop together rather than exporting a CSV per campaign.\n")
     print(f"All figures averaged over {trials} seeds.")
 
 

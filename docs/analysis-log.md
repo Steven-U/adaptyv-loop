@@ -37,14 +37,21 @@ non-binders. At $99/protein and a 14% hit rate, roughly 86% of a $40k
 
 ## 2. What does predict binding? — **KEEP: design method**
 
+Highest and lowest of the 15 categories with n ≥ 5. The full table is in the
+[README](../README.md#the-result) and in the backtest output.
+
 | method | n | binders | rate |
 |---|---|---|---|
 | ProteinMPNN/LigandMPNN | 30 | 13 | 43.3% |
+| *unknown* | 13 | 5 | *38.5%* |
 | Custom PLM | 57 | 14 | 24.6% |
 | BindCraft | 49 | 6 | 12.2% |
 | ProteinMPNN/LigandMPNN + RFdiffusion | 83 | 6 | 7.2% |
 | Custom ensemble/diffusion | 41 | 2 | 4.9% |
 | Rosetta | 6 | 0 | 0.0% |
+
+`unknown` is an absence of a declared method rather than a method, so it is
+reported but never allocated to.
 
 A 9x spread across methods against a 0.64 AUC on individual designs. The most
 popular method in the competition (83 designs) was also nearly the worst.
@@ -143,8 +150,8 @@ rate with 20 pseudo-trials, so it can never collapse.
 
 | strategy | K=60 | K=160 |
 |---|---|---|
-| rank by ipTM | 15.8 | 30.0 |
-| adaptyv-loop | 15.6 | 29.2 |
+| rank by ipTM | 15.7 | 30.0 |
+| adaptyv-loop | 15.5 | 29.2 |
 
 A tie. Two rounds is not enough to learn method rates, and ipTM already
 proxies method on this pool.
@@ -155,10 +162,10 @@ design in both, only method rates transfer:
 
 | strategy | 20 tests | 40 tests | 60 tests |
 |---|---|---|---|
-| random draw | 2.9 | 5.6 | 8.3 |
-| rank by ipTM | 5.5 | 9.7 | 13.0 |
-| method history | 6.9 (+26%) | 11.6 (+20%) | 15.7 (+20%) |
-| method history + ipTM | **7.7 (+41%)** | 11.6 (+19%) | 14.7 (+13%) |
+| random draw | 2.8 | 5.5 | 8.4 |
+| rank by ipTM | 5.5 | 9.6 | 12.9 |
+| method history | 6.9 (+27%) | 11.6 (+20%) | **15.5 (+20%)** |
+| method history + ipTM | **7.7 (+40%)** | 11.5 (+19%) | 14.5 (+13%) |
 
 **Consequence:** the shipped claim is a warm-start claim and is labelled as
 one. The value is in *keeping the history*, which is the argument for wiring

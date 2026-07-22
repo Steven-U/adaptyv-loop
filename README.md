@@ -31,10 +31,10 @@ campaign.collect_round(record, candidates)     # results feed the next round
 
 ## The result
 
-**Allocating test budget by design method finds 13–41% more binders per dollar
+**Allocating test budget by design method finds 13–40% more binders per dollar
 than ranking by ipTM** — the standard filter — once you have one campaign of
-history. Method-history allocation holds a steady +20–26% across every budget
-tested; adding ipTM as a tiebreaker is stronger at small budgets (+41% at 20
+history. Method-history allocation holds a steady +20–27% across every budget
+tested; adding ipTM as a tiebreaker is stronger at small budgets (+40% at 20
 tests) and weaker at larger ones (+13% at 60). At these budgets that's worth
 roughly $100–150 per binder found.
 
@@ -50,16 +50,35 @@ Everything below is measured on Adaptyv's public EGFR competition results
 designs carrying both the computational metrics you have *before* spending
 money and the wet-lab outcome. Reproduce with `python backtest/run_backtest.py`.
 
-**Design method is the lever.** Hit rate by declared method, 14.0% base rate:
+**Design method is the lever.** Hit rate by declared method, 14.0% base rate,
+all 15 categories as the backtest prints them:
 
 | method | n | binders | rate |
 |---|---|---|---|
 | ProteinMPNN/LigandMPNN | 30 | 13 | 43.3% |
+| *unknown* | 13 | 5 | *38.5%* |
 | Custom PLM | 57 | 14 | 24.6% |
+| Custom generative | 11 | 2 | 18.2% |
 | BindCraft | 49 | 6 | 12.2% |
+| ESM2/3 + ProteinMPNN/LigandMPNN + Rosetta | 9 | 1 | 11.1% |
+| ESM2/3 + Rosetta | 10 | 1 | 10.0% |
+| AlphaFold2 | 13 | 1 | 7.7% |
+| TIMED | 13 | 1 | 7.7% |
 | ProteinMPNN/LigandMPNN + RFdiffusion | 83 | 6 | 7.2% |
+| ESM2/3 | 16 | 1 | 6.2% |
 | Custom ensemble/diffusion | 41 | 2 | 4.9% |
+| Custom generative + Custom surrogate | 5 | 0 | 0.0% |
+| ESM2/3 + EvoProtGrad | 8 | 0 | 0.0% |
 | Rosetta | 6 | 0 | 0.0% |
+
+`unknown` posts the second-highest rate in the table and is deliberately not
+allocated to: it is an absence of a declared method, not a method, so there is
+nothing to buy more of. It is shown rather than dropped because excluding a
+38.5% row from a table arguing that method predicts binding would be exactly
+the kind of quiet selection this repo is trying not to do. Nine of the fifteen
+categories carry n < 20, which is why the selection policy shrinks every
+method's posterior toward the base rate rather than trusting these rates
+directly.
 
 The most popular method in the competition was also nearly the worst: 83
 designs used RFdiffusion + ProteinMPNN for a 7.2% return, while 30 designs
@@ -88,14 +107,17 @@ transfer.
 
 | strategy | 20 tests | 40 tests | 60 tests |
 |---|---|---|---|
-| random draw | 2.9 | 5.6 | 8.3 |
-| rank by ipTM | 5.5 | 9.7 | 13.0 |
-| method history | 6.9 (+26%) | 11.6 (+20%) | 15.7 (+20%) |
-| method history + ipTM | **7.7 (+41%)** | **11.6 (+19%)** | 14.7 (+13%) |
+| random draw | 2.8 | 5.5 | 8.4 |
+| rank by ipTM | 5.5 | 9.6 | 12.9 |
+| method history | 6.9 (+27%) | 11.6 (+20%) | **15.5 (+20%)** |
+| method history + ipTM | **7.7 (+40%)** | 11.5 (+19%) | 14.5 (+13%) |
 
 Worth roughly $100–150 per binder found. The value is in *keeping the history*,
 not in any single ordering — which is the argument for wiring the loop together
 rather than exporting a CSV per campaign.
+
+Averaged over 400 seeds. The run is deterministic: seeds are `range(--trials)`,
+so `python backtest/run_backtest.py` reproduces this table exactly.
 
 ## How selection works
 
@@ -245,7 +267,7 @@ pip install -e .            # runtime: requests
 pip install -e '.[dev]'     # + pytest, pandas, numpy, scikit-learn
 pip install -e '.[design]'  # + torch, fair-esm (generation and scoring)
 pytest                      # 76 tests
-python backtest/run_backtest.py
+python backtest/run_backtest.py   # needs '.[dev]' — section 3 skips without scikit-learn
 ```
 
 ## Layout
@@ -269,11 +291,11 @@ python backtest/run_backtest.py
 Three things worth knowing before quoting the numbers above.
 
 **The lift needs history.** With no prior campaign, splitting a budget into an
-explore round and an exploit round only *matches* ipTM ranking (15.6 vs 15.8
+explore round and an exploit round only *matches* ipTM ranking (15.5 vs 15.7
 binders per 60 tests) rather than beating it. Two rounds isn't enough to learn
 method rates, and on this pool ipTM is partly acting as a proxy for method
 anyway — its top 60 designs are 23 ProteinMPNN entries supplying 13 of the 17
-binders found there. The 13–41% figure is a warm-start number and is reported
+binders found there. The 13–40% figure is a warm-start number and is reported
 as one.
 
 **No learned per-design model, deliberately.** A gradient-boosted model on the
