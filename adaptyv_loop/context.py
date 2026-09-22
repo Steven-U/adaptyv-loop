@@ -1,4 +1,4 @@
-"""Context-aware experimental evidence for Sovereign-style planning.
+"""Context-aware experimental evidence for adaptive campaign planning.
 
 The original adaptyv-loop learns one hit rate per declared design method. That
 is intentionally simple and remains the baseline. This module adds a richer,
