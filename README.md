@@ -31,7 +31,7 @@ campaign.collect_round(record, candidates)     # results feed the next round
 
 ## The result
 
-> **Revalidation note:** during the Sovereign biology refactor, the selector was
+> **Revalidation note:** during the context-history refactor, the selector was
 > found to learn from the literal `unknown` method bucket even though this
 > README said that bucket was reporting-only. That is now fixed. The historical
 > 13–40% warm-start figures below describe the previous implementation and
@@ -293,13 +293,13 @@ python backtest/run_backtest.py   # needs '.[dev]' — section 3 skips without s
 | `mock/serve.sh` | brings up the Prism-validated stack |
 | `backtest/foundry_openapi.json` | Adaptyv's real published OpenAPI 3.1 spec |
 
-## Sovereign biology extension
+## Context-aware history experiment
 
-The original selector remains the V1 baseline. `adaptyv_loop.context` adds
-target/assay/protocol/model/reagent/instrument state, recency weighting, and a
-distinction between biological outcomes and QC/technical failures. See
-`docs/SOVEREIGN-BIOLOGY.md` for the benchmark sequence before making any
-stronger performance claim.
+The original selector remains the baseline. `adaptyv_loop.context` adds
+explicit experimental context, recency weighting, and a distinction between
+biological outcomes and QC/technical failures. This is evaluated separately in
+`docs/CONTEXTUAL-BENCHMARK.md`; the synthetic regime-shift benchmark is a
+software test, not a biological performance claim.
 
 ## Method notes and limits
 
