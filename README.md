@@ -270,7 +270,7 @@ completeness rather than as the demo.
 pip install -e .            # runtime: requests
 pip install -e '.[dev]'     # + pytest, pandas, numpy, scikit-learn
 pip install -e '.[design]'  # + torch, fair-esm (generation and scoring)
-pytest                      # 76 tests
+pytest                      # 83 tests
 python backtest/run_backtest.py   # needs '.[dev]' — section 3 skips without scikit-learn
 ```
 
