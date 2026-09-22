@@ -24,6 +24,7 @@ from .errors import APIError, GuardrailViolation
 from .guardrails import DecisionLog, SpendGuard, SpendPolicy
 from .selection import (
     Candidate,
+    MethodPosterior,
     MethodStats,
     Selection,
     build_posteriors,
@@ -177,12 +178,15 @@ class Campaign:
         n_slots: int,
         *,
         mode: str | None = None,
+        posteriors: Mapping[str, MethodPosterior] | None = None,
         **kwargs: Any,
     ) -> Selection:
         """Choose designs for the next round using accumulated history.
 
         Defaults to ``explore`` while history is thin and ``exploit`` once
-        there is enough to separate methods.
+        there is enough to separate methods. A caller may inject explicit
+        posteriors, including context-aware Sovereign posteriors, without
+        changing the campaign's execution or spend guardrails.
         """
         history = self.state.stats()
         tested = sum(s.tested for s in history)
@@ -195,7 +199,7 @@ class Campaign:
         return select_designs(
             fresh,
             n_slots,
-            posteriors=build_posteriors(history),
+            posteriors=posteriors if posteriors is not None else build_posteriors(history),
             mode=mode,  # type: ignore[arg-type]
             **kwargs,
         )
