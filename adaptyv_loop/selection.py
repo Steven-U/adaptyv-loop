@@ -4,8 +4,8 @@ Motivation, measured on Adaptyv's public EGFR competition data (402 designs
 with wet-lab ground truth; see ``backtest/``):
 
 * Per-design confidence metrics are weak binder/non-binder discriminators.
-  ipTM scores AUC 0.648, pLDDT 0.656, ESM2 pseudo-log-likelihood 0.559, and
-  pae_interaction 0.374 — the last one pointing the *opposite* way to the
+  ipTM scores AUC 0.636, pLDDT 0.656, ESM2 pseudo-log-likelihood 0.547, and
+  pae_interaction 0.388 — the last one pointing the *opposite* way to the
   usual "lower iPAE is better" convention.
 * The design *method* is a far stronger lever, and it is knowable before any
   money is spent. Hit rate ran from 43% (ProteinMPNN/LigandMPNN, 13/30) to
@@ -16,8 +16,8 @@ with wet-lab ground truth; see ``backtest/``):
 
 So this module does not try to out-predict ipTM per design. It allocates the
 budget across methods using a Beta-Binomial posterior over each method's hit
-rate, and only uses the per-design score to order candidates *within* a
-method, where a weak signal is still better than none.
+rate, then combines that with a global score percentile. Global ranking is
+intentional because the measured ipTM signal is partly method-confounded.
 
 The two modes matter for a multi-round campaign. Round one has no history, so
 ``explore`` (Thompson sampling) spreads the budget and buys information. Later
@@ -37,7 +37,7 @@ UNKNOWN_METHOD = "unknown"
 
 #: Pooled binder rate across Adaptyv's public EGFR competition data, used as
 #: the prior mean for a method with no history of its own.
-REFERENCE_BASE_RATE = 0.12
+REFERENCE_BASE_RATE = 0.14
 #: Pseudo-trials of :data:`REFERENCE_BASE_RATE` mixed into the pooled estimate.
 GLOBAL_PRIOR_WEIGHT = 20.0
 
@@ -76,7 +76,7 @@ class MethodPosterior:
     Shrinkage is what stops a method that went 3-for-3 in a pilot from eating
     an entire campaign budget. ``prior_weight`` is the number of pseudo-trials
     of global-base-rate evidence mixed in; at the default of 8, a 3-for-3
-    method with a 12% global rate posts a posterior mean near 0.35 rather
+    method with a 14% global rate posts a posterior mean near 0.35 rather
     than 1.0.
     """
 
@@ -121,7 +121,11 @@ def build_posteriors(
     ``global_rate`` defaults to the pooled hit rate across all history, which
     is the right prior mean for a method we have not seen yet.
     """
-    stats = list(history)
+    # Missing provenance is not a reusable design method. Keep the literal
+    # "unknown" bucket visible in reporting, but never learn a method-specific
+    # boost from it. This matches the README and prevents a high unknown-bucket
+    # hit rate from contaminating warm-start allocation.
+    stats = [s for s in history if s.method != UNKNOWN_METHOD]
     total_tested = sum(s.tested for s in stats)
     total_hits = sum(s.hits for s in stats)
     if global_rate is None:
@@ -290,8 +294,8 @@ def select_designs(
     ]
 
     cap = max(1, int(math.floor(n_slots * max_method_fraction)))
-    n_methods_available = len(by_method)
-    reserve_methods = min(min_methods, n_methods_available)
+    known_methods_available = [m for m in by_method if m != UNKNOWN_METHOD]
+    reserve_methods = min(min_methods, len(known_methods_available))
 
     # Ties are broken at random rather than by input order, so a caller cannot
     # accidentally profit (or suffer) from how their dataframe happened to be
@@ -309,7 +313,7 @@ def select_designs(
         seeded: set[str] = set()
         for i in order:
             m = candidates[i].method or UNKNOWN_METHOD
-            if m in seeded:
+            if m == UNKNOWN_METHOD or m in seeded:
                 continue
             chosen.append(i)
             per_method[m] = per_method.get(m, 0) + 1

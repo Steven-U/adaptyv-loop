@@ -15,6 +15,16 @@
 """
 
 from .campaign import Campaign, CampaignState, RoundRecord, outcomes_from_results
+from .context import (
+    ContextualMethodPosterior,
+    ContextWeighting,
+    ExperimentalContext,
+    ExperimentObservation,
+    ObservationKind,
+    build_contextual_posteriors,
+    context_similarity,
+    recency_weight,
+)
 from .client import CostEstimate, FoundryClient, build_experiment_spec
 from .errors import (
     AdaptyvError,
@@ -43,21 +53,29 @@ __all__ = [
     "Campaign",
     "CampaignState",
     "Candidate",
+    "ContextualMethodPosterior",
+    "ContextWeighting",
     "CostEstimate",
     "Decision",
     "DecisionLog",
+    "ExperimentalContext",
+    "ExperimentObservation",
     "FoundryClient",
     "GuardrailViolation",
     "MethodPosterior",
     "MethodStats",
+    "ObservationKind",
     "RateLimited",
     "RoundRecord",
     "Selection",
     "SpendGuard",
     "SpendPolicy",
+    "build_contextual_posteriors",
     "build_experiment_spec",
     "build_posteriors",
     "campaign_report",
+    "context_similarity",
     "outcomes_from_results",
+    "recency_weight",
     "select_designs",
 ]

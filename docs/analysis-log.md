@@ -151,7 +151,7 @@ rate with 20 pseudo-trials, so it can never collapse.
 | strategy | K=60 | K=160 |
 |---|---|---|
 | rank by ipTM | 15.7 | 30.0 |
-| adaptyv-loop | 15.5 | 29.2 |
+| adaptyv-loop | 15.5 | 29.0 |
 
 A tie. Two rounds is not enough to learn method rates, and ipTM already
 proxies method on this pool.
@@ -164,12 +164,15 @@ design in both, only method rates transfer:
 |---|---|---|---|
 | random draw | 2.8 | 5.5 | 8.4 |
 | rank by ipTM | 5.5 | 9.6 | 12.9 |
-| method history | 6.9 (+27%) | 11.6 (+20%) | **15.5 (+20%)** |
-| method history + ipTM | **7.7 (+40%)** | 11.5 (+19%) | 14.5 (+13%) |
+| method history | 6.9 (+26%) | 11.6 (+21%) | **14.4 (+12%)** |
+| method history + ipTM | **8.5 (+56%)** | 11.2 (+17%) | 13.6 (+5%) |
 
-**Consequence:** the shipped claim is a warm-start claim and is labelled as
-one. The value is in *keeping the history*, which is the argument for wiring
-the loop together rather than exporting a CSV per campaign.
+**Revalidation note:** the original implementation accidentally learned a
+posterior for the literal `unknown` method bucket. After fixing missing
+provenance to remain at the prior, method-history-only still beats ipTM at all
+three warm-start budgets (+12% to +26%). The score-combined policy is more
+budget-sensitive (+5% to +56%). The value remains in keeping usable history,
+but the exact lift is not a universal constant.
 
 ---
 
