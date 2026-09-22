@@ -185,7 +185,7 @@ class Campaign:
 
         Defaults to ``explore`` while history is thin and ``exploit`` once
         there is enough to separate methods. A caller may inject explicit
-        posteriors, including context-aware Sovereign posteriors, without
+        posteriors, including context-aware external posteriors, without
         changing the campaign's execution or spend guardrails.
         """
         history = self.state.stats()
