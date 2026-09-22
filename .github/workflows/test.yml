@@ -16,3 +16,5 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -e '.[dev]'
       - run: pytest -q
+      - run: python backtest/run_context_benchmark.py --trials 400
+      - run: python backtest/run_backtest.py --trials 400
