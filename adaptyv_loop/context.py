@@ -128,6 +128,8 @@ def context_similarity(
     ):
         old = getattr(historical, field_name)
         new = getattr(current, field_name)
+        if old is None and new is None:
+            continue
         if old is None or new is None:
             weight *= weighting.unknown_penalty
         elif old != new:
