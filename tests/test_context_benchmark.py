@@ -1,4 +1,4 @@
-from backtest.run_context_benchmark import run_benchmark
+from adaptyv_loop.regime_benchmark import run_benchmark
 
 
 def test_context_benchmark_adapts_faster_than_context_free():
