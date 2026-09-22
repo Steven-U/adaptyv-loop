@@ -9,7 +9,13 @@ from adaptyv_loop.context import (
     ObservationKind,
     build_contextual_posteriors,
 )
-from adaptyv_loop.selection import Candidate, UNKNOWN_METHOD, select_designs
+from adaptyv_loop.selection import (
+    Candidate,
+    MethodStats,
+    UNKNOWN_METHOD,
+    build_posteriors,
+    select_designs,
+)
 
 
 NOW = datetime(2026, 9, 22, tzinfo=timezone.utc)
@@ -128,3 +134,14 @@ def test_contextual_posteriors_can_drive_existing_selector():
         seed=0,
     )
     assert {c.method for c in selection.chosen} == {"good"}
+
+
+def test_legacy_posterior_does_not_learn_unknown_bucket():
+    posts = build_posteriors(
+        [
+            MethodStats(method=UNKNOWN_METHOD, tested=13, hits=5),
+            MethodStats(method="known", tested=10, hits=2),
+        ]
+    )
+    assert posts[UNKNOWN_METHOD].tested == 0
+    assert posts[UNKNOWN_METHOD].hits == 0
