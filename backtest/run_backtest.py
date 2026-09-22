@@ -325,11 +325,10 @@ def section_campaign(r2: pd.DataFrame, trials: int) -> None:
             ("method history + ipTM", float(np.mean(both))),
         ], total, base)
 
-    print("Verdict: with one prior campaign of history, allocating by method beats")
-    print("ipTM ranking by 13-40%, steady at +20-27% for method history alone, worth")
-    print("~$100-150 per binder found at these budgets. The value is in KEEPING the")
-    print("history, not in any one ordering — which is the whole argument for wiring")
-    print("the loop together rather than exporting a CSV per campaign.\n")
+    print("Verdict: with one prior campaign of history, method-history allocation")
+    print("beats ipTM across the tested warm-start budgets. Combining method history")
+    print("with ipTM is more budget-sensitive. Read the table above rather than")
+    print("treating any single lift percentage as universal.\n")
     print(f"All figures averaged over {trials} seeds.")
 
 
