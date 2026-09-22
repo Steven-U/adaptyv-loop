@@ -31,18 +31,16 @@ campaign.collect_round(record, candidates)     # results feed the next round
 
 ## The result
 
-> **Revalidation note:** during the context-history refactor, the selector was
-> found to learn from the literal `unknown` method bucket even though this
-> README said that bucket was reporting-only. That is now fixed. The historical
-> 13–40% warm-start figures below describe the previous implementation and
-> should be rerun before being quoted as a current result.
+A revalidation found that the literal `unknown` method bucket had been
+receiving a learned method posterior despite being missing provenance. That is
+now fixed: unknown provenance stays at the prior rather than becoming a
+reusable method-specific signal.
 
-**Allocating test budget by design method finds 13–40% more binders per dollar
-than ranking by ipTM** — the standard filter — once you have one campaign of
-history. Method-history allocation holds a steady +20–27% across every budget
-tested; adding ipTM as a tiebreaker is stronger at small budgets (+40% at 20
-tests) and weaker at larger ones (+13% at 60). At these budgets that's worth
-roughly $100–150 per binder found.
+**With one campaign of history, method-history allocation finds 12–26% more
+binders than ranking by ipTM across the 20/40/60-test warm-start budgets.**
+Combining method history with ipTM ranges from +5% to +56% depending on budget.
+These are retrospective held-out-design results on one EGFR competition
+population, not a cross-target claim.
 
 The reason is a signal most pipelines throw away. Everyone filters on
 per-design confidence scores, which turn out to be weak, while the design
@@ -77,11 +75,10 @@ all 15 categories as the backtest prints them:
 | ESM2/3 + EvoProtGrad | 8 | 0 | 0.0% |
 | Rosetta | 6 | 0 | 0.0% |
 
-`unknown` posts the second-highest rate in the table and is deliberately not
-allocated to: it is an absence of a declared method, not a method, so there is
-nothing to buy more of. It is shown rather than dropped because excluding a
-38.5% row from a table arguing that method predicts binding would be exactly
-the kind of quiet selection this repo is trying not to do. Nine of the fifteen
+`unknown` posts the second-highest raw rate in the table, but it is an
+absence of declared provenance rather than a reusable method. It is therefore
+shown for transparency while its history is held at the prior instead of being
+learned as a method-specific advantage. Nine of the fifteen
 categories carry n < 20, which is why the selection policy shrinks every
 method's posterior toward the base rate rather than trusting these rates
 directly.
@@ -115,10 +112,11 @@ transfer.
 |---|---|---|---|
 | random draw | 2.8 | 5.5 | 8.4 |
 | rank by ipTM | 5.5 | 9.6 | 12.9 |
-| method history | 6.9 (+27%) | 11.6 (+20%) | **15.5 (+20%)** |
-| method history + ipTM | **7.7 (+40%)** | 11.5 (+19%) | 14.5 (+13%) |
+| method history | 6.9 (+26%) | 11.6 (+21%) | **14.4 (+12%)** |
+| method history + ipTM | **8.5 (+56%)** | 11.2 (+17%) | 13.6 (+5%) |
 
-Worth roughly $100–150 per binder found. The value is in *keeping the history*,
+At these budgets the method-history-only policy costs roughly $288, $341, and
+$412 per binder respectively, versus about $362, $412, and $461 for ipTM. The value is in *keeping the history*,
 not in any single ordering — which is the argument for wiring the loop together
 rather than exporting a CSV per campaign.
 
@@ -310,7 +308,7 @@ explore round and an exploit round only *matches* ipTM ranking (15.5 vs 15.7
 binders per 60 tests) rather than beating it. Two rounds isn't enough to learn
 method rates, and on this pool ipTM is partly acting as a proxy for method
 anyway — its top 60 designs are 23 ProteinMPNN entries supplying 13 of the 17
-binders found there. The 13–40% figure is a warm-start number and is reported
+binders found there. The reported lift is a warm-start result and is reported
 as one.
 
 **No learned per-design model, deliberately.** A gradient-boosted model on the
