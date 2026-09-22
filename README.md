@@ -31,6 +31,12 @@ campaign.collect_round(record, candidates)     # results feed the next round
 
 ## The result
 
+> **Revalidation note:** during the Sovereign biology refactor, the selector was
+> found to learn from the literal `unknown` method bucket even though this
+> README said that bucket was reporting-only. That is now fixed. The historical
+> 13–40% warm-start figures below describe the previous implementation and
+> should be rerun before being quoted as a current result.
+
 **Allocating test budget by design method finds 13–40% more binders per dollar
 than ranking by ipTM** — the standard filter — once you have one campaign of
 history. Method-history allocation holds a steady +20–27% across every budget
@@ -50,7 +56,7 @@ Everything below is measured on Adaptyv's public EGFR competition results
 designs carrying both the computational metrics you have *before* spending
 money and the wet-lab outcome. Reproduce with `python backtest/run_backtest.py`.
 
-**Design method is the lever.** Hit rate by declared method, 14.0% base rate,
+**Design method was the strongest observed lever in this dataset.** Hit rate by declared method, 14.0% base rate,
 all 15 categories as the backtest prints them:
 
 | method | n | binders | rate |
@@ -277,7 +283,8 @@ python backtest/run_backtest.py   # needs '.[dev]' — section 3 skips without s
 | `adaptyv_loop/client.py` | Foundry API client — auth, retries, backoff, pagination, spec validation |
 | `adaptyv_loop/guardrails.py` | spend ceilings, dry-run gate, append-only decision log |
 | `adaptyv_loop/selection.py` | Beta-Binomial method posteriors, budget allocation |
-| `adaptyv_loop/campaign.py` | the resumable loop |
+| `adaptyv_loop/context.py` | context/recency-weighted experimental evidence and failure semantics |
+| `adaptyv_loop/campaign.py` | the resumable loop; accepts externally supplied posteriors |
 | `adaptyv_loop/design.py` | four generators + local ESM-2 scoring |
 | `adaptyv_loop/bench.py` | simulated bench for novel designs, calibrated to the real data |
 | `adaptyv_loop/report.py` | spend and yield in budget-holder units |
@@ -285,6 +292,14 @@ python backtest/run_backtest.py   # needs '.[dev]' — section 3 skips without s
 | `mock/mock_foundry.py` | local Foundry serving real EGFR data in real schema shapes |
 | `mock/serve.sh` | brings up the Prism-validated stack |
 | `backtest/foundry_openapi.json` | Adaptyv's real published OpenAPI 3.1 spec |
+
+## Sovereign biology extension
+
+The original selector remains the V1 baseline. `adaptyv_loop.context` adds
+target/assay/protocol/model/reagent/instrument state, recency weighting, and a
+distinction between biological outcomes and QC/technical failures. See
+`docs/SOVEREIGN-BIOLOGY.md` for the benchmark sequence before making any
+stronger performance claim.
 
 ## Method notes and limits
 
